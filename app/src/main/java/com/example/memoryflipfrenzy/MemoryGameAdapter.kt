@@ -9,9 +9,10 @@ import android.view.ViewGroup.MarginLayoutParams
 import android.widget.ImageButton
 import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
+import com.example.memoryflipfrenzy.models.BoardSize
 import kotlin.math.min
 
-class MemoryGameAdapter(private val context: Context, private val numPieces: Int) :
+class MemoryGameAdapter(private val context: Context, private val boardSize: BoardSize) :
     RecyclerView.Adapter<MemoryGameAdapter.ViewHolder>() {
 
     companion object{
@@ -20,8 +21,8 @@ class MemoryGameAdapter(private val context: Context, private val numPieces: Int
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val cardWidth = parent.width / 2 - (2 * MARGIN)
-        val cardHeight = parent.height / 4 - (2 * MARGIN)
+        val cardWidth = parent.width / boardSize.getWidth() - (2 * MARGIN)
+        val cardHeight = parent.height / boardSize.getHeight() - (2 * MARGIN)
         val cardSideLength = min(cardWidth, cardHeight)
         val view = LayoutInflater.from(context).inflate(R.layout.memory_card, parent, false)
         val layoutParams = view.findViewById<CardView>(R.id.cardView).layoutParams as MarginLayoutParams
@@ -31,7 +32,7 @@ class MemoryGameAdapter(private val context: Context, private val numPieces: Int
         return ViewHolder(view)
     }
 
-    override fun getItemCount(): Int = numPieces
+    override fun getItemCount(): Int = boardSize.numCards
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.bind(position)
@@ -42,7 +43,9 @@ class MemoryGameAdapter(private val context: Context, private val numPieces: Int
         private val imageButton = itemView.findViewById<ImageButton>(R.id.imageButton)
 
         fun bind(position: Int){
-            Log.i(TAG, "Clicked on card $position")
+            imageButton.setOnClickListener {
+                Log.i(TAG, "Clicked on card $position")
+            }
         }
     }
 }
