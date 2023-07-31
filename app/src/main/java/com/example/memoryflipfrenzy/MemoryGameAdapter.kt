@@ -16,13 +16,18 @@ import kotlin.math.min
 class MemoryGameAdapter(
     private val context: Context,
     private val boardSize: BoardSize,
-    private val cards: List<MemoryCard>
+    private val cards: List<MemoryCard>,
+    private val cardClickListener: CardClickListener
 ) :
     RecyclerView.Adapter<MemoryGameAdapter.ViewHolder>() {
 
     companion object{
         private const val MARGIN = 10
         private const val TAG = "MemoryGameAdapter"
+    }
+
+    interface CardClickListener {
+        fun onCardClicked(position: Int)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -57,6 +62,7 @@ class MemoryGameAdapter(
             )
             imageButton.setOnClickListener {
                 Log.i(TAG, "Clicked on card $position")
+                cardClickListener.onCardClicked(position)
             }
         }
     }
