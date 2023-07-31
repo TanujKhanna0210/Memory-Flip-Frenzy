@@ -12,7 +12,11 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.memoryflipfrenzy.models.BoardSize
 import kotlin.math.min
 
-class MemoryGameAdapter(private val context: Context, private val boardSize: BoardSize) :
+class MemoryGameAdapter(
+    private val context: Context,
+    private val boardSize: BoardSize,
+    private val cardImages: List<Int>
+) :
     RecyclerView.Adapter<MemoryGameAdapter.ViewHolder>() {
 
     companion object{
@@ -43,6 +47,7 @@ class MemoryGameAdapter(private val context: Context, private val boardSize: Boa
         private val imageButton = itemView.findViewById<ImageButton>(R.id.imageButton)
 
         fun bind(position: Int){
+            imageButton.setImageResource(cardImages[position])
             imageButton.setOnClickListener {
                 Log.i(TAG, "Clicked on card $position")
             }
