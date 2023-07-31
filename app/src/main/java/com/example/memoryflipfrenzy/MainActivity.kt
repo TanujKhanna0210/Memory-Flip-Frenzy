@@ -6,6 +6,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.memoryflipfrenzy.models.BoardSize
+import com.example.memoryflipfrenzy.models.MemoryCard
 import com.example.memoryflipfrenzy.utils.DEFAULT_ICONS
 
 class MainActivity : AppCompatActivity() {
@@ -26,8 +27,9 @@ class MainActivity : AppCompatActivity() {
 
         val chosenImages = DEFAULT_ICONS.shuffled().take(boardSize.getNumPairs())
         val randomizedImages = (chosenImages + chosenImages).shuffled()
+        val memoryCards = randomizedImages.map { MemoryCard(it) }
 
-        rvBoard.adapter = MemoryGameAdapter(this, boardSize, randomizedImages)
+        rvBoard.adapter = MemoryGameAdapter(this, boardSize, memoryCards)
         rvBoard.setHasFixedSize(true)
         rvBoard.layoutManager = GridLayoutManager(this, boardSize.getWidth())
     }
