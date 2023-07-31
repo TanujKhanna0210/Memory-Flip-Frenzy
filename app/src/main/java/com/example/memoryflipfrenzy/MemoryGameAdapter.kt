@@ -8,6 +8,8 @@ import android.view.ViewGroup
 import android.view.ViewGroup.MarginLayoutParams
 import android.widget.ImageButton
 import androidx.cardview.widget.CardView
+import androidx.core.content.ContextCompat
+import androidx.core.view.ViewCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.example.memoryflipfrenzy.models.BoardSize
 import com.example.memoryflipfrenzy.models.MemoryCard
@@ -60,6 +62,11 @@ class MemoryGameAdapter(
                 else
                     R.drawable.ic_launcher_background
             )
+
+            imageButton.alpha = if (memoryCard.isMatched) .4f else 1.0f
+            val colorStateList = if(memoryCard.isMatched) ContextCompat.getColorStateList(context, R.color.gray) else null
+            ViewCompat.setBackgroundTintList(imageButton, colorStateList)
+
             imageButton.setOnClickListener {
                 Log.i(TAG, "Clicked on card $position")
                 cardClickListener.onCardClicked(position)
