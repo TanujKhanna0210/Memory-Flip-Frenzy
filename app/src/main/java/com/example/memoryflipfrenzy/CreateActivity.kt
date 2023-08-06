@@ -6,10 +6,14 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.text.Editable
+import android.text.InputFilter
+import android.text.TextWatcher
 import android.util.Log
 import android.view.MenuItem
 import android.widget.Button
 import android.widget.EditText
+import android.widget.Filter
 import android.widget.Toast
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -25,6 +29,8 @@ class CreateActivity : AppCompatActivity() {
         const val PICK_PHOTO_CODE = 128
         const val READ_EXTERNAL_PHOTOS_CODE = 891
         const val READ_PHOTOS_PERMISSION = android.Manifest.permission.READ_EXTERNAL_STORAGE
+        const val MIN_GAME_NAME_LENGTH = 3
+        const val MAX_GAME_NAME_LENGTH = 14
     }
 
     private lateinit var rvImagePicker : RecyclerView
@@ -49,6 +55,20 @@ class CreateActivity : AppCompatActivity() {
         boardSize = intent.getSerializableExtra(EXTRA_BOARD_SIZE) as BoardSize
         numImagesRequired = boardSize.getNumPairs()
         supportActionBar?.title = "Choose Pics (0 / $numImagesRequired)"
+
+        btnSave.setOnClickListener {
+            saveDataToFirebase()
+        }
+        etGameName.filters = arrayOf(InputFilter.LengthFilter(MAX_GAME_NAME_LENGTH))
+        etGameName.addTextChangedListener(object: TextWatcher {
+
+            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
+            override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
+
+            override fun afterTextChanged(p0: Editable?) {
+                btnSave.isEnabled = shouldEnableSaveButton()
+            }
+        })
 
         adapter = ImagePickerAdapter(this, chosenImageUris, boardSize, object: ImagePickerAdapter.ImageClickListener{
             override fun onPlaceHolderClicked() {
@@ -114,8 +134,19 @@ class CreateActivity : AppCompatActivity() {
         btnSave.isEnabled = shouldEnableSaveButton()
     }
 
+    private fun saveDataToFirebase() {
+        TODO("Not yet implemented")
+        Log.i(TAG, "saveDataToFirebase")
+    }
+
     private fun shouldEnableSaveButton(): Boolean {
         // Check if we should enable the save button or not
+        if(chosenImageUris.size != numImagesRequired) {
+            return false
+        }
+        if(etGameName.text.isBlank()  || etGameName.text.length < MIN_GAME_NAME_LENGTH) {
+            return false
+        }
         return true
     }
 
