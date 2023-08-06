@@ -3,9 +3,13 @@ package com.example.memoryflipfrenzy
 import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.graphics.ImageDecoder
 import android.net.Uri
+import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.provider.MediaStore
 import android.text.Editable
 import android.text.InputFilter
 import android.text.TextWatcher
@@ -18,9 +22,11 @@ import android.widget.Toast
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.memoryflipfrenzy.models.BoardSize
+import com.example.memoryflipfrenzy.utils.BitmapScalar
 import com.example.memoryflipfrenzy.utils.EXTRA_BOARD_SIZE
 import com.example.memoryflipfrenzy.utils.isPermissionGranted
 import com.example.memoryflipfrenzy.utils.requestPermission
+import java.io.ByteArrayOutputStream
 
 class CreateActivity : AppCompatActivity() {
 
@@ -137,6 +143,26 @@ class CreateActivity : AppCompatActivity() {
     private fun saveDataToFirebase() {
         TODO("Not yet implemented")
         Log.i(TAG, "saveDataToFirebase")
+
+        for ((index, photoUri) in chosenImageUris.withIndex()) {
+            val imageByteArray = getImageByteArray(photoUri)
+        }
+    }
+
+    private fun getImageByteArray(photoUri: Uri): ByteArray {
+        val originalBitmap = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            val source = ImageDecoder.createSource(contentResolver, photoUri)
+            ImageDecoder.decodeBitmap(source)
+        }
+        else {
+            MediaStore.Images.Media.getBitmap(contentResolver, photoUri)
+        }
+        Log.i(TAG, "Original width ${originalBitmap.width} and height ${originalBitmap.height}")
+        val scaledBitmap = BitmapScalar.scaleToFitHeight(originalBitmap, 250)
+        Log.i(TAG, "Scaled width ${scaledBitmap.width} and height ${scaledBitmap.height}")
+        val byteOutputStream = ByteArrayOutputStream()
+        scaledBitmap.compress(Bitmap.CompressFormat.JPEG, 60, byteOutputStream)
+        return byteOutputStream.toByteArray()
     }
 
     private fun shouldEnableSaveButton(): Boolean {
