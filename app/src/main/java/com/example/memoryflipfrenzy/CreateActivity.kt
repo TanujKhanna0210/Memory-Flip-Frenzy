@@ -1,6 +1,7 @@
 package com.example.memoryflipfrenzy
 
 import android.app.Activity
+import android.app.AlertDialog
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
@@ -22,10 +23,7 @@ import android.widget.Toast
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.memoryflipfrenzy.models.BoardSize
-import com.example.memoryflipfrenzy.utils.BitmapScalar
-import com.example.memoryflipfrenzy.utils.EXTRA_BOARD_SIZE
-import com.example.memoryflipfrenzy.utils.isPermissionGranted
-import com.example.memoryflipfrenzy.utils.requestPermission
+import com.example.memoryflipfrenzy.utils.*
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
@@ -147,8 +145,8 @@ class CreateActivity : AppCompatActivity() {
     }
 
     private fun saveDataToFirebase() {
-        val customGameName = etGameName.text.toString()
         Log.i(TAG, "saveDataToFirebase")
+        val customGameName = etGameName.text.toString()
         var didEncounterError = false
         val uploadedImageUrls = mutableListOf<String>()
         for ((index, photoUri) in chosenImageUris.withIndex()) {
@@ -179,7 +177,25 @@ class CreateActivity : AppCompatActivity() {
     }
 
     private fun handleAllImagesUploaded(gameName: String, imageUrls: MutableList<String>) {
-        // TODO : upload this info to Firestore
+        db.collection("games").document(gameName)
+            .set(mapOf("images" to imageUrls))
+            .addOnCompleteListener { gameCreationTask->
+                if(!gameCreationTask.isSuccessful) {
+                    Log.e(TAG, "Exception with game creation", gameCreationTask.exception)
+                    Toast.makeText(this, "Game creation failed", Toast.LENGTH_SHORT).show()
+                    return@addOnCompleteListener
+                }
+                Log.i(TAG, "Successfully created game $gameName")
+                AlertDialog.Builder(this)
+                    .setTitle("Upload complete! Let's play your game '$gameName'")
+                    .setPositiveButton("OK") {_,_ ->
+                        val resultData = Intent()
+                        resultData.putExtra(EXTRA_GAME_NAME, gameName)
+                        setResult(Activity.RESULT_OK, resultData)
+                        finish()
+                    }
+                    .show()
+            }
     }
 
     private fun getImageByteArray(photoUri: Uri): ByteArray {
