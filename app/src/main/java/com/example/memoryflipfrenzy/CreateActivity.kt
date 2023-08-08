@@ -146,12 +146,35 @@ class CreateActivity : AppCompatActivity() {
 
     private fun saveDataToFirebase() {
         Log.i(TAG, "saveDataToFirebase")
+        btnSave.isEnabled = false
         val customGameName = etGameName.text.toString()
+        //Check that we're not over-writing someone else's data (i.e. checking if the game name is unique or not)
+        db.collection("games").document(customGameName).get()
+            .addOnSuccessListener { document ->
+            if(document != null && document.data != null) {
+                AlertDialog.Builder(this)
+                    .setTitle("Name is already taken")
+                    .setMessage("A game already exists with the name '$customGameName'. Please enter another name.")
+                    .setPositiveButton("OK", null)
+                    .show()
+                btnSave.isEnabled = true
+            } else {
+                handleImageUploading(customGameName)
+            }
+        }
+            .addOnFailureListener { exception->
+                Log.e(TAG, "Encountered error while saving memory game", exception)
+                Toast.makeText(this, "Encountered error while saving memory game", Toast.LENGTH_SHORT).show()
+                btnSave.isEnabled = true
+            }
+    }
+
+    private fun handleImageUploading(gameName: String) {
         var didEncounterError = false
         val uploadedImageUrls = mutableListOf<String>()
         for ((index, photoUri) in chosenImageUris.withIndex()) {
             val imageByteArray = getImageByteArray(photoUri)
-            val filePath = "images/${customGameName}/${System.currentTimeMillis()}-${index}.jpg"
+            val filePath = "images/${gameName}/${System.currentTimeMillis()}-${index}.jpg"
             val photoReference = storage.reference.child(filePath)
             photoReference.putBytes(imageByteArray)
                 .continueWithTask { photoUploadTask ->
@@ -171,7 +194,7 @@ class CreateActivity : AppCompatActivity() {
                     uploadedImageUrls.add(downloadUrl)
                     Log.i(TAG, "Finished uploading $photoUri, num uploaded ${uploadedImageUrls.size}")
                     if(uploadedImageUrls.size == chosenImageUris.size)
-                        handleAllImagesUploaded(customGameName, uploadedImageUrls)
+                        handleAllImagesUploaded(gameName, uploadedImageUrls)
                 }
         }
     }
