@@ -26,6 +26,7 @@ import com.example.memoryflipfrenzy.utils.EXTRA_GAME_NAME
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import com.squareup.picasso.Picasso
 
 class MainActivity : AppCompatActivity() {
 
@@ -130,6 +131,9 @@ class MainActivity : AppCompatActivity() {
             boardSize = BoardSize.getByValue(numCards)
             gameName = customGameName
             customGameImages = userImageList.images
+            for(imageUrl in userImageList.images) {
+                Picasso.get().load(imageUrl).fetch()
+            }
             Snackbar.make(clRoot, "You're now playing '$customGameName'!", Snackbar.LENGTH_LONG).show()
             setupBoard()
         } .addOnFailureListener { exception->
