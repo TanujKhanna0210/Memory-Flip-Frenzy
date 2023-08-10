@@ -12,4 +12,8 @@
 
     <color name="color_progress_none">#DC1E0B</color>
     <color name="color_progress_full">#35BA01</color>
+
+    <color name="dark_green">#347355</color>
+    <color name="blue_green">#60BF81</color>
+    <color name="light_green">#3B8C66</color>
 </resources>

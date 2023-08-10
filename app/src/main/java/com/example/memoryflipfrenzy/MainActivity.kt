@@ -3,6 +3,7 @@ package com.example.memoryflipfrenzy
 import android.animation.ArgbEvaluator
 import android.app.Activity
 import android.content.Intent
+import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -24,6 +25,7 @@ import com.example.memoryflipfrenzy.models.MemoryGame
 import com.example.memoryflipfrenzy.models.UserImageList
 import com.example.memoryflipfrenzy.utils.EXTRA_BOARD_SIZE
 import com.example.memoryflipfrenzy.utils.EXTRA_GAME_NAME
+import com.github.jinatonic.confetti.CommonConfetti
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
@@ -243,6 +245,7 @@ class MainActivity : AppCompatActivity() {
         tvNumPairs.text = "Pairs: ${memoryGame.numPairsFound} / ${boardSize.getNumPairs()}"
         if(memoryGame.haveWonGame()){
             Snackbar.make(clRoot, "Congratulations! You Won.", Snackbar.LENGTH_LONG).show()
+            CommonConfetti.rainingConfetti(clRoot, intArrayOf(Color.BLUE, Color.GREEN, Color.MAGENTA, Color.YELLOW)).oneShot()
         }
 
         val color = ArgbEvaluator().evaluate(
