@@ -12,6 +12,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.EditText
+import android.widget.ProgressBar
 import android.widget.RadioGroup
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
@@ -42,6 +43,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var rvBoard : RecyclerView
     private lateinit var tvNumMoves : TextView
     private lateinit var tvNumPairs : TextView
+    private lateinit var pbDownloading : ProgressBar
 
     private val db = Firebase.firestore
     private var gameName : String? = null
@@ -59,6 +61,7 @@ class MainActivity : AppCompatActivity() {
         rvBoard = findViewById(R.id.rvBoard)
         tvNumMoves = findViewById(R.id.tvNumMoves)
         tvNumPairs = findViewById(R.id.tvNumPairs)
+        pbDownloading = findViewById(R.id.pbDownloading)
 
         setupBoard()
     }
@@ -123,13 +126,16 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun downloadGame(customGameName: String) {
+        pbDownloading.visibility = View.VISIBLE
         db.collection("games").document(customGameName).get().addOnSuccessListener { document ->
             val userImageList = document.toObject(UserImageList::class.java)
             if(userImageList?.images == null) {
+                pbDownloading.visibility = View.GONE
                 Log.e(TAG, "Invalid custom game data from Firestore")
                 Snackbar.make(clRoot, "Sorry we couldn't find any such game, '$customGameName'", Snackbar.LENGTH_LONG).show()
                 return@addOnSuccessListener
             }
+            pbDownloading.visibility = View.GONE
             val numCards = userImageList.images.size * 2
             boardSize = BoardSize.getByValue(numCards)
             customGameImages = userImageList.images
